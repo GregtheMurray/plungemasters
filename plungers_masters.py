@@ -22,7 +22,23 @@ def format_entry(df,df_detail,entry_num):
     except:
         pass
 
+#Set Page config
+def page_config_default():
+    st.set_page_config(layout='wide',initial_sidebar_state='collapsed',page_icon="⛳") 
+                       
+page_config_default()                     
 
+#Disable table hovers
+st.markdown(
+                """
+                <style>
+                [data-testid="stElementToolbar"] {
+                    display: none;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            ) 
 
 
 url = 'https://docs.google.com/spreadsheets/d/1VKIpC91WmA7jIms8AMakdqYSvz4QKerIcYThkF9rzok/export?format=csv&id=1VKIpC91WmA7jIms8AMakdqYSvz4QKerIcYThkF9rzok&gid=448313398'
@@ -111,9 +127,9 @@ else:
     df.drop(columns=['row_num'], inplace=True)
 
     if det_rad == 'Scores': 
-        df_style = df[['Rank','Entry','Name','Total']]
+        df_style = df[['Rank','Entry','Total']]
     elif det_rad == 'Golfers':
-        df_style = df[['Rank','Entry','Name','Total','Golfer 1','Tot',
+        df_style = df[['Rank','Entry','Total','Golfer 1','Tot',
                        'Golfer 2','Tot.1','Golfer 3','Tot.2',
                        'Golfer 4','Tot.3','Golfer 5','Tot.4',
                        'Golfer 6','Tot.5']]
