@@ -134,6 +134,7 @@ else:
                        'Golfer 4','Tot.3','Golfer 5','Tot.4',
                        'Golfer 6','Tot.5']]
     else:
+        df.drop(columns=['Name'], inplace=True)
         df_style = df.style\
             .background_gradient(cmap=cmap,subset=rds,vmin = rd_min,vmax=rd_max)\
             .highlight_null('white')
