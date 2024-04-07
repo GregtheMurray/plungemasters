@@ -24,7 +24,7 @@ def format_entry(df,df_detail,entry_num):
 
 #Set Page config
 def page_config_default():
-    st.set_page_config(layout='wide',initial_sidebar_state='collapsed',page_icon="⛳") 
+    st.set_page_config(layout='centered',initial_sidebar_state='collapsed',page_icon="⛳") 
                        
 page_config_default()                     
 
