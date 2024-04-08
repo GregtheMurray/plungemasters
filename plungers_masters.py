@@ -19,8 +19,13 @@ def format_entry(df,df_detail,entry_num):
                 + '** | Total: **' + str(df['Total'].iloc[entry_num]) + '**')
         out = out.style.background_gradient(cmap=cmap,subset=rds[:4],vmin = rd_min, vmax=rd_max).highlight_null('white')
         st.dataframe(out,hide_index=True)
-    except:
+        mtext = """:gray[*Tiebreaker 1 (Champ Score): {}  |  Tiebreaker 2 (Low Am Score): {}*]""".format(str(df['T1'].iloc[entry_num]),
+                                                                                                  str(df['T2'].iloc[entry_num]))
+        st.markdown(mtext)
+        st.markdown('##')
+    except : 
         pass
+
 
 #Set Page config
 def page_config_default():
@@ -75,9 +80,10 @@ df = get_data(url)
 df['row_num'] = df.reset_index().index
 df['Name'].str.strip()
 
+
 names = sorted(list(df['Name'].unique()))
-names.insert(0,'Entrant Name')
-name_sbx = st.selectbox('Select an Entrant', names, placeholder='Entrant Name',)
+names.insert(0,'All Entries (Defualt)')
+name_sbx = st.selectbox('Select an Entrant', names, placeholder='All Entries (Defualt)',)
 
 
 #Create Entry Details 
@@ -102,14 +108,15 @@ entries_d.sort_values(by=['row_num','Tot',],inplace=True)
 # count_list
 
 
-if name_sbx != 'Entrant Name':
+if name_sbx != 'All Entries (Defualt)':
     entries = df.query("Name == '{}'".format(name_sbx))
     details = entries_d.query("Name == '{}'".format(name_sbx))
 
 
     st.subheader('Entries')
-    entries = entries[['Rank', 'Entry','Total',]]  
-    st.dataframe(entries,hide_index=True)
+    entries = entries[['Rank', 'Entry','Total','T1','T2']]  
+    show_entries = entries[['Rank', 'Entry','Total',]]  
+    st.dataframe(show_entries,hide_index=True)
    
     st.subheader('Entry Details')
 
@@ -132,7 +139,7 @@ else:
         df_style = df[['Rank','Entry','Total','Golfer 1','Tot',
                        'Golfer 2','Tot.1','Golfer 3','Tot.2',
                        'Golfer 4','Tot.3','Golfer 5','Tot.4',
-                       'Golfer 6','Tot.5']]
+                       'Golfer 6','Tot.5','T1','T2']]
     else:
         df.drop(columns=['Name'], inplace=True)
         df_style = df.style\
