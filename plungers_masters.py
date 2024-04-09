@@ -29,7 +29,7 @@ def format_entry(df,df_detail,entry_num):
 
 #Set Page config
 def page_config_default():
-    st.set_page_config(layout='centered',initial_sidebar_state='collapsed',page_icon="⛳") 
+    st.set_page_config(layout='wide',initial_sidebar_state='collapsed',page_icon="⛳") 
                        
 page_config_default()                     
 
@@ -78,17 +78,18 @@ with hcol2:
 
 df = get_data(url)
 df['row_num'] = df.reset_index().index
-df['Name'].str.strip()
+df['Entry'] = df['Entry'].str.strip(' ')
+df['Entry'] = df['Entry'].str.replace("'",'')
 
 # Data Prep
-
+ 
 #Create Entry Details 
-g1 = df[['Rank','Entry','Name','Golfer 1','R1','R2','R3','R4', 'Tot','row_num','Total']]
-g2 = df[['Rank','Entry','Name','Golfer 2','R1.1','R2.1','R3.1','R4.1','Tot.1','row_num','Total']]
-g3 = df[['Rank','Entry','Name','Golfer 3','R1.2','R2.2','R3.2','R4.2','Tot.2','row_num','Total']]
-g4 = df[['Rank','Entry','Name','Golfer 4','R1.3','R2.3','R3.3','R4.3','Tot.3','row_num','Total']]
-g5 = df[['Rank','Entry','Name','Golfer 5','R1.4','R2.4','R3.4','R4.4','Tot.4','row_num','Total']]
-g6 = df[['Rank','Entry','Name','Golfer 6','R1.5','R2.5','R3.5','R4.5','Tot.5','row_num','Total']]
+g1 = df[['Rank','Entry','Name','Pos', 'Golfer 1','Today','Thru','Score','R1','R2','R3','R4', 'Tot','row_num','Total']]
+g2 = df[['Rank','Entry','Name','Pos.1','Golfer 2','Today.1','Thru.1','Score.1','R1.1','R2.1','R3.1','R4.1','Tot.1','row_num','Total']]
+g3 = df[['Rank','Entry','Name','Pos.2','Golfer 3','Today.2','Thru.2','Score.2','R1.2','R2.2','R3.2','R4.2','Tot.2','row_num','Total']]
+g4 = df[['Rank','Entry','Name','Pos.3','Golfer 4','Today.3','Thru.3','Score.3','R1.3','R2.3','R3.3','R4.3','Tot.3','row_num','Total']]
+g5 = df[['Rank','Entry','Name','Pos.4','Golfer 5','Today.4','Thru.4','Score.4','R1.4','R2.4','R3.4','R4.4','Tot.4','row_num','Total']]
+g6 = df[['Rank','Entry','Name','Pos.5','Golfer 6','Today.5','Thru.5','Score.5','R1.5','R2.5','R3.5','R4.5','Tot.5','row_num','Total']]
 
 #clean up 
 entries_d = pd.DataFrame(np.vstack([g1,g2,g3,g4,g5,g6]), columns=g1.columns)
@@ -155,8 +156,9 @@ with tab2:
     
     if sbx_entry != 'Entry Name':
         sel_entry = entry_golfer_list.query("Entry == '{}'".format(sbx_entry))
+        compare_entries = entry_golfer_list.query("Entry != '{}'".format(sbx_entry))
         sim_df = pd.DataFrame()
-        for idx, row in entry_golfer_list.iterrows():
+        for idx, row in compare_entries.iterrows():
 
             entry_list = set(sel_entry['Golfer'].iloc[0])
             compare_list = set(row['Golfer'])
@@ -170,8 +172,7 @@ with tab2:
 
             sim_df = pd.concat([sim_df,row], ignore_index=True)
 
-        
-        # st.dataframe(sel_entry['Golfer'],hide_index=True)
+    
         
         golfer_str =''
         for n, golfer in enumerate(sorted(sel_entry['Golfer'].iloc[0])):
@@ -198,7 +199,7 @@ with tab2:
         
         
         
-        st.write('**Entry Counts by # of similar Golfers :golfer:**')
+        st.write('**Entry Counts by # of Similar Golfers :golfer:**')
         st.dataframe(g_sim,hide_index=True)
         # st.bar_chart(g_sim,)
 
