@@ -1,13 +1,20 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import datetime
 from  matplotlib.colors import LinearSegmentedColormap
 
 #set colormap for gradients
 cmap=LinearSegmentedColormap.from_list('rg',["#ff006e", "w", "#0a9396"], N=256) 
 
+def roundDownDateTime(dt):
+    delta_min = dt.minute % 5
+    return datetime.datetime(dt.year, dt.month, dt.day,
+                             dt.hour, dt.minute - delta_min)
+
+
 @st.cache_data
-def get_data(url):
+def get_data(url,timestamp):
     df = pd.read_csv(url)
     return df
 
@@ -59,15 +66,7 @@ rds = ['R1','R2','R3','R4',
 
 
 
-
-
-
 ### Page Start ###
-with st.sidebar:
-    st.write('**Options**')
-    with st.container(border=True):
-        det_rad = st.radio('Standing Detail Level',options=['Scores','Golfers','Rounds'], captions=['Entry Scores', '\+ Golfer Scores', '\+ Golfer Round Scores'])
-
 
 hcol1,hcol2 = st.columns([.2,.8])
 with hcol1:
@@ -76,7 +75,7 @@ with hcol2:
     st.title('Masters Leaderboard')
 
 
-df = get_data(url)
+df = get_data(url,roundDownDateTime(pd.Timestamp.now()))
 df['row_num'] = df.reset_index().index
 df['Entry'] = df['Entry'].str.strip(' ')
 df['Entry'] = df['Entry'].str.replace("'",'')
@@ -130,16 +129,23 @@ with tab1:
 
 
     else:
+        # Data Detail options
+        with st.expander('Data Display Options'):
+            with st.container(border=True):
+                det_rad = st.radio('Standing Detail Level',
+                                options=['Scores','Golfers','Rounds'],
+                                captions=['Entry Scores', f'+ Golfer Scores', f'+ Golfer Round Scores'])
+        # Standings
         st.subheader(':trophy: Standings')
         df.drop(columns=['row_num'], inplace=True)
 
         if det_rad == 'Scores': 
-            df_style = df[['Rank','Entry','Total']]
+            df_style = df[['Rank','Entry','Total','T1','T2']]
         elif det_rad == 'Golfers':
-            df_style = df[['Rank','Entry','Total','Golfer 1','Tot',
-                        'Golfer 2','Tot.1','Golfer 3','Tot.2',
-                        'Golfer 4','Tot.3','Golfer 5','Tot.4',
-                        'Golfer 6','Tot.5','T1','T2']]
+            df_style = df[['Rank','Entry','Total','Golfer 1','Score',
+                        'Golfer 2','Score.1','Golfer 3','Score.2',
+                        'Golfer 4','Score.3','Golfer 5','Score.4',
+                        'Golfer 6','Score.5','T1','T2']]
         else:
             df.drop(columns=['Name'], inplace=True)
             df_style = df.style\
