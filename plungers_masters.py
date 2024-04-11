@@ -14,7 +14,7 @@ def roundDownDateTime(dt):
 
 
 @st.cache_data
-def get_data(url,timestamp):
+def get_data(url,timestamp = None):
     df = pd.read_csv(url)
     return df
 
@@ -74,7 +74,7 @@ with hcol1:
 with hcol2:
     st.title('Masters Leaderboard')
 
-
+# df = get_data(url) ## Use during testing to avoide repulling data.
 df = get_data(url,roundDownDateTime(pd.Timestamp.now()))
 df['row_num'] = df.reset_index().index
 df['Entry'] = df['Entry'].str.strip(' ')
@@ -163,6 +163,9 @@ with tab2:
     if sbx_entry != 'Entry Name':
         sel_entry = entry_golfer_list.query("Entry == '{}'".format(sbx_entry))
         compare_entries = entry_golfer_list.query("Entry != '{}'".format(sbx_entry))
+
+        entries = df.query("Entry == '{}'".format(sbx_entry))
+        details = entries_d.query("Entry == '{}'".format(sbx_entry)).drop(columns=['Name','row_num'])      
         sim_df = pd.DataFrame()
         for idx, row in compare_entries.iterrows():
 
@@ -178,21 +181,8 @@ with tab2:
 
             sim_df = pd.concat([sim_df,row], ignore_index=True)
 
-    
-        
-        golfer_str =''
-        for n, golfer in enumerate(sorted(sel_entry['Golfer'].iloc[0])):
-            if n == 5:
-                golfer_str += golfer
-            else:
-                golfer_str += golfer+ ', '
-        with st.container(border=True):
-            st.write('''Entry: **{}** | Rank: **{}** | Total: **{}**  
-                    Golfers:  
-                    {}'''.format(sel_entry['Entry'].iloc[0],
-                                        sel_entry['Rank'].iloc[0],
-                                        sel_entry['Total'].iloc[0],
-                                        golfer_str ))
+        #get entry details
+        format_entry(entries, details,0)
             
         g_sim = sim_df.groupby(['count_sim'])['row_num'].count().reset_index()
 
@@ -211,5 +201,7 @@ with tab2:
 
         with st.expander('See Entry Similarity Details'):
             sim_df.sort_values(['count_sim','row_num'],ascending =[False,True],inplace=True)
-            sim_display = sim_df[['Rank','Entry','Total','count_sim','common','different']]
+            sim_display = sim_df[['Rank','Entry','Total','count_sim','common','different']]\
+                        .merge(df[['Entry','T1','T2']],on='Entry')
+            sim_display = sim_display[['Rank','Entry','Total','T1','T2','count_sim','common','different']]
             st.dataframe(sim_display,hide_index=True)
