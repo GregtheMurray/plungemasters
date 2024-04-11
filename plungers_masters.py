@@ -77,8 +77,9 @@ with hcol2:
 # df = get_data(url) ## Use during testing to avoide repulling data.
 df = get_data(url,roundDownDateTime(pd.Timestamp.now()))
 df['row_num'] = df.reset_index().index
+df['Entry'] = df['Entry'].astype(str)
 df['Entry'] = df['Entry'].str.strip(' ')
-df['Entry'] = df['Entry'].str.replace("'",'')
+df['Entry'] = df['Entry'].str.replace("'",'')           
 
 # Data Prep
  
@@ -104,10 +105,10 @@ tab1, tab2 = st.tabs(['Leaderboard','Similar Entries'])
 
 with tab1:
     names = sorted(list(df['Name'].unique()))
-    names.insert(0,'All Entries (Defualt)')
-    name_sbx = st.selectbox('Select an Entrant', names, placeholder='All Entries (Defualt)',)
+    names.insert(0,'All Entries (Default)')
+    name_sbx = st.selectbox('Select an Entrant', names, placeholder='All Entries (Default)',)
 
-    if name_sbx != 'All Entries (Defualt)':
+    if name_sbx != 'All Entries (Default)':
         entries = df.query("Name == '{}'".format(name_sbx))
         details = entries_d.query("Name == '{}'".format(name_sbx))
 
